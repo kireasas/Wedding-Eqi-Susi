@@ -301,6 +301,7 @@ nav a:hover{background:var(--light)}
 .it .nd:after{top:2.5px;right:2.5px;bottom:2.5px;left:2.5px}.it.hl .tx:before{top:-18px;right:-10px;bottom:-18px;left:-10px}
 nav{-webkit-backdrop-filter:blur(8px)}
 .seg label.on{background:#eceac9;border-color:#6f6c37;color:#4e5a2a;font-weight:500}
+#guest{margin:4px 0 12px;color:#fff;text-align:center;font-family:'Cormorant Garamond',serif;line-height:1.35;max-width:88%}#guest[hidden]{display:none}#guest small{display:block;font-size:.95rem;opacity:.9;letter-spacing:.04em}#guest b{display:block;margin-top:4px;font-weight:600;font-size:clamp(1.25rem,6vw,1.8rem);overflow-wrap:anywhere}
 </style></head><body class="locked">
 
 <div id="cover">
@@ -308,6 +309,7 @@ nav{-webkit-backdrop-filter:blur(8px)}
   <div class="names" id="cn"></div>
   <div class="serif" id="cd" style="font-size:1.3rem;letter-spacing:.1em"></div>
   <img class="envimg" id="envbtn" data-n="env" alt="Buka undangan" role="button" tabindex="0">
+  <div id="guest" hidden><small>Kepada Yth.<br>Bapak/Ibu/Saudara/i</small><b id="gn"></b></div>
   <button class="btn" id="open"><img class="bk" data-n="book" alt=""> Buka Undangan</button>
   <div id="hint">Tombolnya malu-malu… coba ketuk amplopnya ✉️</div>
 </div>
@@ -516,6 +518,16 @@ addEventListener('scroll',()=>{document.querySelectorAll('.petal').forEach((p,i)
   var L=document.querySelectorAll('.seg label');
   function upd(){for(var i=0;i<L.length;i++){var x=L[i].querySelector('input');L[i].classList.toggle('on',!!(x&&x.checked))}}
   var I=document.querySelectorAll('.seg input');for(var j=0;j<I.length;j++)I[j].addEventListener('change',upd);upd();
+})();
+</script>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search);
+  var n=(q.get('to')||q.get('nama')||q.get('kepada')||'').replace(/\s+/g,' ').trim().slice(0,60);
+  if(!n)return;
+  document.getElementById('gn').textContent=n;document.getElementById('guest').hidden=false;
+  var a=document.querySelector('#rf input[name=n]');if(a&&!a.value)a.value=n;
+  var b=document.querySelector('#wf input[name=n]');if(b&&!b.value)b.value=n;
 })();
 </script>
 </body></html>
