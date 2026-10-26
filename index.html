@@ -302,6 +302,7 @@ nav a:hover{background:var(--light)}
 nav{-webkit-backdrop-filter:blur(8px)}
 .seg label.on{background:#eceac9;border-color:#6f6c37;color:#4e5a2a;font-weight:500}
 #guest{margin:4px 0 12px;color:#fff;text-align:center;font-family:'Cormorant Garamond',serif;line-height:1.35;max-width:88%}#guest[hidden]{display:none}#guest small{display:block;font-size:.95rem;opacity:.9;letter-spacing:.04em}#guest b{display:block;margin-top:4px;font-weight:600;font-size:clamp(1.25rem,6vw,1.8rem);overflow-wrap:anywhere}
+#wl{position:relative;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#b08a4a transparent}#wl::-webkit-scrollbar{width:5px}#wl::-webkit-scrollbar-thumb{background:#b08a4a;border-radius:4px}#wlh{text-align:center;font:italic .95rem 'Cormorant Garamond',serif;color:#8c7768;margin-top:8px}#wlh[hidden]{display:none}
 </style></head><body class="locked">
 
 <div id="cover">
@@ -390,7 +391,7 @@ nav{-webkit-backdrop-filter:blur(8px)}
   <h2>Ucapan &amp; Doa</h2>
   <form id="wf"><input name="n" placeholder="Nama Anda" required><textarea name="m" rows="3" placeholder="Tulis ucapan..." required></textarea>
   <button class="btn" style="width:100%;justify-content:center">Kirim Ucapan</button></form>
-  <div id="wl"></div>
+  <div id="wl"></div><div id="wlh" hidden>↓ Gulir untuk melihat ucapan lainnya</div>
 </div></div></div></section>
 
 <section id="close" class="light"><div class="wrap rv"><img class="fl" data-n="f24" alt="" style="left:-16px;bottom:-50px;width:110px"><img class="fl" data-n="f23" alt="" style="right:-10px;bottom:-60px;width:96px;animation-delay:2s"><div class="stamp"><img class="seal2" data-n="seal" alt="">
@@ -462,9 +463,13 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 let wishes=[];
 const loadWishes=async()=>{const u=W.rsvpEndpoint;if(!u)return wishes;try{const r=await fetch(u+'?action=wishes');const d=await r.json();if(d&&Array.isArray(d.wishes))wishes=d.wishes.map(x=>({n:x.nama,m:x.pesan}))}catch(_){}return wishes};
 const saveWish=async w=>{wishes.unshift(w);const u=W.rsvpEndpoint;if(u)await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'wish',nama:w.n,pesan:w.m})})};
-function draw(L){$('wl').innerHTML=L.length?L.map(w=>`<div class="wish"><b>${esc(w.n)}</b><small>${esc(w.m)}</small></div>`).join(''):'<div class="wish" style="text-align:center"><small>Belum ada ucapan. Jadilah yang pertama.</small></div>'}
-async function render(){draw(await loadWishes())}
-$('wf').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));const bt=e.target.querySelector('button');bt.disabled=true;const t0=bt.textContent;bt.textContent='Mengirim...';try{await saveWish(f);e.target.reset();growW();draw(wishes);setTimeout(render,1500)}catch(err){alert('Maaf, ucapan belum terkirim. Periksa koneksi lalu coba lagi.')}bt.disabled=false;bt.textContent=t0};render();
+function draw(L){$('wl').innerHTML=L.length?L.map(w=>`<div class="wish"><b>${esc(w.n)}</b><small>${esc(w.m)}</small></div>`).join(''):'<div class="wish empty" style="text-align:center"><small>Belum ada ucapan. Jadilah yang pertama.</small></div>'}
+function fitWL(){var wl=$('wl'),it=wl.children,hn=$('wlh');wl.style.maxHeight='none';wl.style.overflowY='visible';
+  if(it.length<=5||it[0].classList.contains('empty')){hn.hidden=true;return}
+  wl.style.overflowY='auto';var l=it[4];wl.style.maxHeight=(l.offsetTop+l.offsetHeight+4)+'px';hn.hidden=false}
+addEventListener('resize',function(){fitWL()});
+async function render(){draw(await loadWishes());fitWL()}
+$('wf').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));const bt=e.target.querySelector('button');bt.disabled=true;const t0=bt.textContent;bt.textContent='Mengirim...';try{await saveWish(f);e.target.reset();growW();draw(wishes);fitWL();setTimeout(render,1500)}catch(err){alert('Maaf, ucapan belum terkirim. Periksa koneksi lalu coba lagi.')}bt.disabled=false;bt.textContent=t0};render();
 setInterval(()=>{if(document.visibilityState=='visible')render()},30000);
 // reveal
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.15});
